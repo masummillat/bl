@@ -1,0 +1,12 @@
+ {
+    "1,21": "International mother language day",
+    "2,17":"Sheikh Mjibur Rahman's birthday",
+    "2,26":"Independence day",
+    "3,14": "Bangali NewYear",
+    "3,29": "Buddha Purnima",
+    "4,1": "May day",
+    "7,15": "National Mourning Day",
+    "11,16": "Victory Day",
+    "11,25": "Chrismas Day"
+
+ }
