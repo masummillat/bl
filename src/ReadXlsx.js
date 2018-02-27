@@ -16,7 +16,6 @@ import XLSX from 'xlsx';
 //     "11,25": "Chrismas Day"
 // };
 //
-var slaDay = 1;
 var holi;
 var holidays
 fetch('holidays/holidays.txt')
@@ -34,11 +33,22 @@ class ReadXlsx extends Component {
         super(props);
         this.state = {
             data: [], /* Array of Arrays e.g. [["a","b"],[1,2]] */
-            cols: []  /* Array of column objects e.g. { name: "C", K: 2 } */
+            cols: [],  /* Array of column objects e.g. { name: "C", K: 2 } */
+            slaDay:1,
         };
         this.handleFile = this.handleFile.bind(this);
         this.exportFile = this.exportFile.bind(this);
+        this.handleSlaChange = this.handleSlaChange.bind(this);
     };
+
+    handleSlaChange(e) {
+
+        this.setState({
+            slaDay:e.target.value
+        })
+        console.log(this.state.slaDay)
+
+    }
 
     handleFile(file/*:File*/) {
         /* Boilerplate to set up FileReader */
@@ -123,7 +133,7 @@ class ReadXlsx extends Component {
                     slaStatus[i] = "Sla Status";
                 } else if (slaStatus[i] === "Not Processed" || slaStatus[i] === "Not Instanced") {
 
-                } else if (slaDay >= diffDays[i]) {
+                } else if (this.state.slaDay >= diffDays[i]) {
                     slaStatus[i] = "Sla Meet"
                 } else {
                     slaStatus[i] = "Sla Missed";
@@ -131,7 +141,8 @@ class ReadXlsx extends Component {
                     var Pday = new Date(ProcessData[i]);
                     var nextday;
                     var count = 0;
-                    var slaCount = slaDay;
+                    console.log(this.state.slaDay)
+                    var slaCount = this.state.slaDay;
                     while (Iday < Pday) {
                         nextday = addDays(Iday, 1);
                         console.log("My instance " + InstanceDate[i]);
@@ -243,13 +254,15 @@ class ReadXlsx extends Component {
         XLSX.writeFile(wb, "sheetjs.xlsx")
     };
 
-    render() {
 
+
+    render() {
+            console.log(this.state.slaDay)
         return (
             <DragDropFile handleFile={this.handleFile}>
                 <div className="row">
                     <div className="col-xs-12">
-                        <DataInput handleFile={this.handleFile}/>
+                        <DataInput sla={this.handleSlaChange} handleFile={this.handleFile}/>
                     </div>
                 </div>
                 <div className="row">
@@ -295,43 +308,52 @@ const make_cols = refstr => {
 class DataInput extends React.Component {
     constructor(props) {
         super(props);
+        this.state={
+            setSla:'none',
+        }
         this.handleChange = this.handleChange.bind(this);
-        this.handleSlaSubmit = this.handleSlaSubmit.bind(this);
+        this.handleSla = this.handleSla.bind(this)
+
     };
 
+    handleSla(e){
+        this.props.sla(e);
+        if(e.target.value>=1){
+            this.setState({
+                setSla:'block'
+            })
+        }else{
+            this.setState({
+                setSla:'none'
+            })
+        }
+
+    }
     handleChange(e) {
         const files = e.target.files;
         if (files && files[0]) this.props.handleFile(files[0]);
     };
 
-    handleSlaSubmit(e) {
-        e.preventDefault();
-        const slad = e.target.slaDay.value;
-        if(slad <= 0){
-            alert("Invalid sla day ? please input positive integer");
 
-        }else {
-            slaDay=slad;
-            console.log(slaDay)
-        }
-
-    }
 
     render() {
+        const {setSla}= this.state;
         return (
             <div>
+                <label>Sla Day: </label>
+                <input name="slaDay" type="number" onChange={this.handleSla} />
+
+
                 <form className="form-inline">
-                    <div className="form-group">
+                    <div className="form-group" style={{display:this.state.setSla}}>
                         <label htmlFor="file">Spreadsheet</label>
                         <input type="file" className="form-control" id="file" accept={SheetJSFT}
                                onChange={this.handleChange}/>
                     </div>
                 </form>
-                <form className="" onSubmit={this.handleSlaSubmit}>
-                    <label>Sla Day: </label>
-                    <input name="slaDay" type="number" />
-                    <button className="btn-success"type="submit">submit</button>
-                </form>
+
+
+
             </div>
 
         );
